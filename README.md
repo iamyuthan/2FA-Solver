@@ -10,8 +10,8 @@
 - [Overview](#overview)
 - [2FA-Solver Web Page - Demo](#2fa-solver-web-page)
 - [User Guide](#user-guide)
-- - [QR Code (Image) Generator/Encoder](#qr-code-(Image)-generator/encoder)
-- - [QR Code (Image) Scanner/Decoder](#qr-code-(Image)-scanner/decoder)
+- - [QR Code (Image) Generator/Encoder](#qr-code-Image-generatorencoder)
+- - [QR Code (Image) Scanner/Decoder](#qr-code-Image-scannerdecoder)
 - - [Retrieve One-Time Password in Real-Time](#retrieve-one-time-password-in-real-time)
 
 
@@ -35,8 +35,8 @@ Also, it can be deployed on an online environment as shown in the [2FA Solver](h
 ### User Guide
 
 2FA Solver Web interface will consist of three main modules:
-- [**QR Code (Image) Generator/Encoder**](#qr-code-(Image)-generator/encoder) - *Encodes any content or the URL into a QR code Image.*
-- [**QR Code (Image) Scanner/Decoder**](#qr-code-(Image)-scanner/decoder) - *Scans and extracts the content from a QR code image.*
+- [**QR Code (Image) Generator/Encoder**](#qr-code-Image-generatorencoder) - *Encodes any content or the URL into a QR code Image.*
+- [**QR Code (Image) Scanner/Decoder**](#qr-code-Image-scannerdecoder) - *Scans and extracts the content from a QR code image.*
 - [**Retrieve One-Time Password in Real-Time**](#retrieve-one-time-password-in-real-time) - *Provides real-time OTP for a given secret key like google authenticator.*
 
 
@@ -62,7 +62,7 @@ You can copy the extracted secret key (as highlighted below in red colour in the
 
 #### Retrieve One-Time Password in Real-Time
 
-Paste the secret key obtained from the [QR Code (Image) Scanner/Decoder](#qr-code-(Image)-scanner/decoder) tab (or the secret key you already have in hand) into the **Secret (base32)** text box (as highlighted below in red colour in the below screenshot).
+Paste the secret key obtained from the [QR Code (Image) Scanner/Decoder](#qr-code-Image-scannerdecoder) tab (or the secret key you already have in hand) into the **Secret (base32)** text box (as highlighted below in red colour in the below screenshot).
 
 
 The application will start displaying the OTP that belongs to the key in real-time, as shown below.
