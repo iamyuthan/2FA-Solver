@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    
+	<!-- 
+		@license MIT
+		@version 1.0.0
+		@author - Yuthan K - https://github.com/iamyuthan/2FA-Solver
+		@inspired from - Nuintun - https://github.com/nuintun/qrcode/
+		@inspired from - Russau - http://jsfiddle.net/russau/ch8PK/
+	-->
+	
+	<!-- 
+	MIT License
+
+	Copyright (c) 2021 Yuthan K
+
+	Permission is hereby granted, free of charge, to any person obtaining a copy
+	of this software and associated documentation files (the "Software"), to deal
+	in the Software without restriction, including without limitation the rights
+	to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+	copies of the Software, and to permit persons to whom the Software is
+	furnished to do so, subject to the following conditions:
+
+	The above copyright notice and this permission notice shall be included in all
+	copies or substantial portions of the Software.
+
+	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+	SOFTWARE.
+	-->
+  
+    <title>2FA Solver</title>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" type="text/css" href="configs/default.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="configs/favicon.ico" />
+	<script type="text/javascript" src="configs/sha.js"></script>
+	<link rel="stylesheet" type="text/css" href="configs/bootstrap.min.css">
+  </head>
+  <body>
+    <div class="main">
+	<div class="hd-1">
+	<span class="fw-semibold" style="color:#ffe600">2FA Solver</span></a>
+	</div>
+      <ul class="tabs clearfix">
+        <li class="selected">Generate QR Code Image</li>
+        <li>Decode QR code Image</li>
+		<li>Retrieve One-time Password</li>
+      </ul></br>	  
+      <ul class="content clearfix">
+        <li class="encode selected">
+          <p><label>QR code content：</label></p>
+          <div><textarea id="encode-text" style="background:#ccf2ff">Inspired from Nuintun and Russau! Developed by Yuthan K.</textarea></div>
+          <p>
+            <label>Error correction level：</label>
+            <select id="encode-eclevel" style="background:#ccf2ff">
+              <option value="L">Level L (7%)</option>
+              <option value="M" selected>Level M (15%)</option>
+              <option value="Q">Level Q (25%)</option>
+              <option value="H">Level H (30%)</option>
+            </select>
+            <label class="indent">Support ECI：</label>
+            <input id="encoding-hint" style="background:#ccf2ff" type="checkbox" />
+            <label class="indent">Encoding：</label>
+            <select id="encode-mode" style="background:#ccf2ff">
+              <option value="Auto" selected>Auto</option>
+              <option value="QRByte">Byte</option>
+              <option value="QRAlphanumeric">Alphanumeric</option>
+              <option value="QRNumeric">Numeric</option>
+              <option value="QRKanji">Kanji</option>
+            </select>
+            <label class="indent">QR image size：</label>
+            <input id="encode-msize" style="background:#ccf2ff" type="number" min="1" max="10" value="4" />
+            <label class="indent">White background size：</label>
+            <input id="encode-margin" style="background:#ccf2ff" type="number" min="0" max="40" value="12" />
+          </p>
+          <p>
+            <button id="encode-btn" style="background:#ffcc66"><b>Generate</b></button>
+          </p>
+          <div id="encode-result" class="encode-result hide"></div>
+        </li>
+        <li class="decode">
+          <p><label>Choose the QR code picture：</label><input type="file" accept="image/*" id="decode-file"  style="background:#ffcc66" /></p>
+          <div>
+            <canvas id="decode-canvas"></canvas>
+          </div>
+          <p>
+            <button id="decode-btn" style="background:#ffcc66"><b>Decode</b></button>
+          </p>
+          <p id="decode-text" class="hide"><b>The decoded value is：</b><br /><br /><b><textarea readonly class="text4style" style="background:#00ff00"></textarea></b></p>
+        </li>
+		<li class="retrieve">
+          
+          
+
+                <form>
+                <fieldset>
+                   
+                    <div class="clearfix col-md-6">
+                        <label for="secret">Secret (base32)</label>
+                        <div class="input"><textarea id="secret" class="text2style" style="background:#ccf2ff" rows="1">JBSWY3DPEHPK3PXP</textarea></div>
+                    </br>
+					
+                        <label>Updating in</label>
+                        <div class="input"><span id='updatingIn'></span></div>
+                    </br>
+					
+                        <label>One-time Password</label>
+                        <div class="input"><b><textarea readonly id="otp" class="text3style" style="background:#00ff00" rows="1"></textarea></b></div>
+                    </div>
+                    <!-- /clearfix -->
+                    <div class="clearfix col-md-6">
+                        <label>Secret (hex)</label>
+                        <div class="input"><span class="label label-default" id="secretHex"></span>
+                            <span id='secretHexLength'></span></div></br>
+                                        
+                        <label>Unix epoch div 30 (padded hex)</label>
+                        <div class="input"><span class="label label-default" id='epoch'></span></div></br>
+                    
+                        <label>HMAC(secret, time)</label>
+                        <div class="input" id='hmac'></div></br>
+                    </div>
+                              
+                </fieldset>
+                </form>
+                
+        </li>
+      </ul>
+    <p><u>Author:</u> <b>Yuthan K</b> </br>
+	<a href="https://github.com/iamyuthan/2FA-Solver" target="_blank">GitHub</a> | <a href="https://linkedin.com/in/iamyuthan" target="_blank">LinkedIn</a></p>
+	</div>
+    <script src="configs/jquery.slim.min.js"></script>
+	<!-- 
+		@author - Nuintun
+	-->
+    <script type="text/javascript">
+      if (self.Uint8ClampedArray) {
+        if (!Uint8ClampedArray.from) {
+          Uint8ClampedArray.from = function (array) {
+            return new Uint8ClampedArray(array);
+          };
+        }
+
+        if (!Uint8ClampedArray.prototype.forEach) {
+          var APForEach = Array.prototype.forEach;
+
+          Uint8ClampedArray.prototype.forEach = function (callback, context) {
+            return APForEach.call(this, callback, context);
+          };
+        }
+      }
+    </script>
+    <script type="text/javascript" src="configs/qrcode.js"></script>
+    <script type="text/javascript">
+      // Tab Switch
+      var nav = $('.tabs li');
+      var content = $('.content li');
+
+      nav.on('click', function () {
+        var target = $(this);
+
+        nav.removeClass('selected');
+
+        target.addClass('selected');
+
+        content.removeClass('selected').eq(target.index()).addClass('selected');
+      });
+
+      var TEST_NUMERIC = /^\d+$/;
+      var TEST_ALPHANUMERIC = /^[0-9A-Z$%*+-./: ]+$/;
+
+      function chooseBestModeData(data) {
+        if (TEST_NUMERIC.test(data)) {
+          return new QRCode.QRNumeric(data);
+        } else if (TEST_ALPHANUMERIC.test(data)) {
+          return new QRCode.QRAlphanumeric(data);
+        }
+
+        try {
+          return new QRCode.QRKanji(data);
+        } catch (error) {
+          return new QRCode.QRByte(data);
+        }
+      }
+
+      var encodeText = $('#encode-text');
+      var encodeMode = $('#encode-mode');
+      var encodingHint = $('#encoding-hint');
+      var encodeECLevel = $('#encode-eclevel');
+      var encodeMargin = $('#encode-margin');
+      var encodeMSize = $('#encode-msize');
+      var encodeResult = $('#encode-result');
+
+      // Generate QR code
+      $('#encode-btn').on('click', function () {
+        var data = encodeText.val();
+        var mode = encodeMode.val();
+        var ecLevel = encodeECLevel.val();
+        var margin = Number(encodeMargin.val());
+        var moduleSize = Number(encodeMSize.val());
+        var hasEncodingHint = encodingHint.prop('checked');
+
+        if (!data) {
+          encodeResult.addClass('hide');
+
+          return alert('Please enter the content for generating the QR code');
+        }
+
+        var qrcode = new QRCode.Encoder();
+        var errorCorrectionLevel = QRCode.ErrorCorrectionLevel[ecLevel];
+
+        qrcode.setEncodingHint(hasEncodingHint).setErrorCorrectionLevel(errorCorrectionLevel);
+
+        try {
+          var data = mode === 'Auto' ? chooseBestModeData(data) : new QRCode[mode](data);
+
+          qrcode.write(data).make();
+
+          encodeResult.html('<img src="' + qrcode.toDataURL(moduleSize, margin) + '" />');
+          encodeResult.removeClass('hide');
+
+          console && console.log(qrcode);
+        } catch (error) {
+          encodeResult.addClass('hide');
+
+          alert(error.message);
+        }
+      });
+
+      var hasImage = false;
+      var imageData = null;
+      var decodeText = $('#decode-text');
+      var canvas = $('#decode-canvas')[0];
+      var context = canvas.getContext('2d');
+      var decodeResult = decodeText.find('textarea');
+
+      function resetDecoder() {
+        hasImage = false;
+        imageData = null;
+
+        decodeResult.val('');
+        decodeText.addClass('hide');
+      }
+
+      function drawImage(src) {
+        var img = new Image();
+
+        img.crossOrigin = 'anonymous';
+
+        img.onload = function () {
+          var width = img.width;
+          var height = img.height;
+          var actualWidth = Math.min(960, width);
+          var actualHeight = height * (actualWidth / width);
+
+          hasImage = true;
+          canvas.width = actualWidth;
+          canvas.height = actualHeight;
+
+          context.drawImage(img, 0, 0, width, height, 0, 0, actualWidth, actualHeight);
+
+          imageData = context.getImageData(0, 0, actualWidth, actualHeight);
+        };
+
+        img.src = src;
+      }
+
+      // QR code loading
+      $('#decode-file').on('change', function (e) {
+        var file = e.target.files[0];
+
+        if (file) {
+          resetDecoder();
+
+          var reader = new FileReader();
+
+          reader.onload = function (e) {
+            drawImage(e.target.result);
+          };
+
+          reader.readAsDataURL(file);
+        }
+      });
+
+      function getImageData() {
+        imageData && context.putImageData(imageData, 0, 0);
+
+        return imageData || context.getImageData(0, 0, canvas.width, canvas.height);
+      }
+
+      function getModuleSize(location, version) {
+        var topLeft = location.topLeft;
+        var topRight = location.topRight;
+        var a = Math.abs(topRight.x - topLeft.x);
+        var b = Math.abs(topRight.y - topLeft.y);
+        var c = Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2));
+
+        return c / (version * 4 + 17);
+      }
+
+      function markFinderPattern(x, y, moduleSize) {
+        context.fillStyle = '#00ff00';
+
+        context.beginPath();
+        context.arc(x, y, moduleSize * 0.75, 0, 2 * Math.PI);
+        context.fill();
+      }
+
+      function markQRCodeArea(location, version) {
+        context.lineWidth = 2;
+        context.strokeStyle = '#00ff00';
+
+        context.beginPath();
+        context.moveTo(location.topLeft.x, location.topLeft.y);
+        context.lineTo(location.topRight.x, location.topRight.y);
+        context.lineTo(location.bottomRight.x, location.bottomRight.y);
+        context.lineTo(location.bottomLeft.x, location.bottomLeft.y);
+        context.lineTo(location.topLeft.x, location.topLeft.y);
+        context.stroke();
+
+        var moduleSize = getModuleSize(location, version);
+
+        markFinderPattern(location.topLeftFinder.x, location.topLeftFinder.y, moduleSize);
+        markFinderPattern(location.topRightFinder.x, location.topRightFinder.y, moduleSize);
+        markFinderPattern(location.bottomLeftFinder.x, location.bottomLeftFinder.y, moduleSize);
+      }
+
+      $('#decode-btn').on('click', function () {
+        if (!hasImage) {
+          return alert('Please select a QR code image');
+        }
+
+        var imageData = getImageData();
+        var result = new QRCode.Decoder()
+          .setOptions({ canOverwriteImage: false })
+          .decode(imageData.data, imageData.width, imageData.height);
+
+        if (result) {
+          decodeResult.val(result.data);
+          decodeText.removeClass('hide');
+
+          markQRCodeArea(result.location, result.version);
+
+          console && console.log(result);
+        } else {
+          alert('QR code decoding failed');
+        }
+      });
+
+      /https?:/i.test(location.protocol) && drawImage('./qrcode.jpg');
+    </script>
+	
+	<!-- 
+		@author - Russau
+	-->
+	
+	<script type="text/javascript">//<![CDATA[
+
+
+    function dec2hex(s) { return (s < 15.5 ? '0' : '') + Math.round(s).toString(16); }
+    function hex2dec(s) { return parseInt(s, 16); }
+
+    function base32tohex(base32) {
+        var base32chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+        var bits = "";
+        var hex = "";
+
+        for (var i = 0; i < base32.length; i++) {
+            var val = base32chars.indexOf(base32.charAt(i).toUpperCase());
+            bits += leftpad(val.toString(2), 5, '0');
+        }
+
+        for (var i = 0; i+4 <= bits.length; i+=4) {
+            var chunk = bits.substr(i, 4);
+            hex = hex + parseInt(chunk, 2).toString(16) ;
+        }
+        return hex;
+
+    }
+
+    function leftpad(str, len, pad) {
+        if (len + 1 >= str.length) {
+            str = Array(len + 1 - str.length).join(pad) + str;
+        }
+        return str;
+    }
+	
+	function updateOtp() {
+            
+        var key = base32tohex($('#secret').val());
+        var epoch = Math.round(new Date().getTime() / 1000.0);
+        var time = leftpad(dec2hex(Math.floor(epoch / 30)), 16, '0');
+		
+
+        // updated for jsSHA v2.0.0 - http://caligatio.github.io/jsSHA/
+        var shaObj = new jsSHA("SHA-1", "HEX");
+        shaObj.setHMACKey(key, "HEX");
+        shaObj.update(time);
+        var hmac = shaObj.getHMAC("HEX");
+		
+		$('#secretHex').text(key);
+        $('#secretHexLength').text((key.length * 4) + ' bits'); 
+        $('#epoch').text(time);
+        $('#hmac').empty();
+
+        if (hmac == 'KEY MUST BE IN BYTE INCREMENTS') {
+            $('#hmac').append($('<span/>').addClass('label important').append(hmac));
+        } else {
+            var offset = hex2dec(hmac.substring(hmac.length - 1));
+            var part1 = hmac.substr(0, offset * 2);
+            var part2 = hmac.substr(offset * 2, 8);
+            var part3 = hmac.substr(offset * 2 + 8, hmac.length - offset);
+            if (part1.length > 0 ) $('#hmac').append($('<span/>').addClass('label label-default').append(part1));
+            $('#hmac').append($('<span/>').addClass('label label-primary').append(part2));
+            if (part3.length > 0) $('#hmac').append($('<span/>').addClass('label label-default').append(part3));
+        }
+
+        var otp = (hex2dec(hmac.substr(offset * 2, 8)) & hex2dec('7fffffff')) + '';
+        otp = (otp).substr(otp.length - 6, 6);
+
+        $('#otp').text(otp);
+    }
+		
+function timer()
+{
+    var epoch = Math.round(new Date().getTime() / 1000.0);
+	var sect = " secs";
+    var countDown = 30 - (epoch % 30);
+    if (epoch % 30 == 0) updateOtp();
+    $('#updatingIn').text(countDown + sect);
+    
+}
+
+    $(function () {
+        updateOtp();
+
+        $('#update').click(function (event) {
+            updateOtp();
+            event.preventDefault();
+        });
+
+        $('#secret').keyup(function () {
+            updateOtp();
+        });
+        
+        setInterval(timer, 1000);
+    });
+
+
+  //]]></script>
+  </body>
+</html>
