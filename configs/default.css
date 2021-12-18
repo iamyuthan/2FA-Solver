@@ -1,0 +1,140 @@
+body {
+  margin: 0;
+  background: #f0f0f0;
+  font-family: "Microsoft YaHei", serif;
+}
+
+body .hide {
+  display: none;
+}
+
+.main {
+  width: 1000px;
+  margin: 20px auto;
+  border: 1px solid #bbb;
+  background: #f2f2f2;
+}
+
+ul,
+li {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+
+.clearfix {
+  zoom: 1;
+}
+
+.clearfix:after {
+  visibility: hidden;
+  display: block;
+  font-size: 0;
+  content: " ";
+  clear: both;
+  height: 0;
+}
+
+.encode-btn {
+	background: #3399ff;
+}
+
+.indent {
+  margin-left: 16px;
+}
+
+.tabs {
+  width: 1002px;
+  margin: -1px;
+  height: 40px;
+}
+
+.tabs li {
+  float: left;
+  width: 500px;
+  height: 38px;
+  line-height: 38px;
+  text-align: center;
+  border: 1px solid #bbb;
+  color: #747480;
+  background: #ffe600;
+  font-weight: 500;
+}
+
+.tabs li.selected {
+  height: 39px;
+  border-width: 1px 0 0 0;
+  font-weight: 600;
+}
+
+.content {
+  margin: 20px;
+  position: relative;
+}
+
+.content li {
+  display: none;
+}
+
+.content li.selected {
+  display: block;
+}
+
+textarea {
+  width: 100%;
+  height: 200px;
+  resize: none;
+  padding: 8px;
+  box-sizing: border-box;
+}
+
+.encode-result {
+  padding: 8px;
+  display: inline-block;
+  background: #f0f0f0;
+}
+
+.encode-result img {
+  display: block;
+  max-width: 944px;
+}
+
+.hd-1 {
+  display: inline-flex;
+  align-items: center;
+  padding: .25rem .5rem;
+  font-weight: 600;
+  color: #f2f2f2;
+  background-color: #747480;
+  border: 0;
+  text-align: center;
+}
+
+.fw-semibold { font-weight: 600; }
+.align-items-center { text-align: center; }
+
+.text2style {
+	height: 39px;
+	width: 440px;
+}
+
+.text3style {
+	height: 39px;
+	width: 65px;
+}
+
+.text4style {
+	height: 39px;
+	width: 810px;
+}
+
+label,
+select,
+input {
+  vertical-align: middle;
+}
+
+input[type="text"],
+input[type="number"] {
+  width: 60px;
+}
