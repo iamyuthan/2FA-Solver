@@ -19,8 +19,8 @@
 
 2FA Solver is a Javascript+HTML based web page that helps to generate/scan QR codes and retrieve One Time Password real-time using the secret key.
 
-It can be used offline without any internet connection by downloading the [2FA-Solver.html](https://github.com/iamyuthan/2FA-Solver/blob/Master/2FA-Solver.html) file along with the [configs](https://github.com/iamyuthan/2FA-Solver/tree/Master/configs) folder. 
-Also, it can be deployed on an online environment as shown in the [2FA Solver](https://iamyuthan.github.io/2FA-Solver/2FA-Solver.html) site. However, generating/scanning QR codes and retrieving real-time OTP does not require an internet connection.
+It can be used offline without any internet connection by downloading the [2FA-Solver.html](https://github.com/iamyuthan/2FA-Solver/blob/Master/2FA-Solver.html) file along with the [configs](https://github.com/iamyuthan/2FA-Solver/tree/Master/configs) folder and accessing it from the local machine. 
+It can also be deployed on an online environment, as shown in the [2FA Solver](https://iamyuthan.github.io/2FA-Solver/2FA-Solver.html) site. However, generating/scanning QR codes and retrieving real-time OTP does not require an internet connection.
 
 
 ### 2FA-Solver Web Page
